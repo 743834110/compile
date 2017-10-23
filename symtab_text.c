@@ -8,7 +8,7 @@ char * words[12] = {
 
 int main(){
 	int i;
-	printf("[insert]\n"); //·´
+	printf("[insert]\n"); //·´¶Ô
 	for (i = 0; i < 12; i ++){
 		printf("%s  ", words[i]);
 		sym_insert(words[i], K_VAR,0);

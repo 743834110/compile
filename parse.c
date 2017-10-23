@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <string.h>
 #include "lex.h"
+#include "symtab.h"
 
 void expr();
 void stmt();
@@ -17,9 +19,24 @@ char * sym_names[] = {
 FILE *file = NULL;
 int level = 0;
 
+void symbol_def(char *ID){
+	char str[50] = "redefine ID:";
+	symItem p = sym_find(ID);
+	if (p == NULL)
+		p = sym_insert(strdup(ID), K_VAR, 0);
+	else
+		errExit(strcat(str, ID));
+}
+void symbol_use(char *ID){
+	char str[50] = "undefine ID:";
+	if (sym_find(ID) == NULL)
+		errExit(strcat(str, ID));
+}
+
 void factor(){
 	switch(token->sym){
 		case ID:{
+			symbol_use(token->ID);				// 检查标识符是否有定义 
 			token = getToken();			// skip ID
 			break;
 		}
@@ -68,7 +85,11 @@ void stmt_assign(){
 		errExit("expect '='");
 	token = getToken();				//skip ASSIGN
 	
-	expr();					
+	expr();	
+	while (token->sym == ASSIGN){	// 添加重复赋值的判断
+		token = getToken();
+		expr(); 
+	} 
 	if (token->sym != SEMI)
 		errExit("expect ';'");
 	token = getToken();				// skip SEMI 	
@@ -164,11 +185,14 @@ void var_def(){
 	loop:{
 		if (token->sym != ID)
 			errExit("expect ID");
+		symbol_def(token->ID);				// 检查变量是否已经定义，定义后就报错 
 		token = getToken();			// skip ID
-		if (token->sym != ASSIGN)
-			errExit("expect '='");
-		token = getToken();			// skip '=' 
-		expr();
+//		if (token->sym != ASSIGN)
+//			errExit("expect '='");
+		if (token->sym == ASSIGN){ 
+			token = getToken();			// skip '=' 
+			expr();
+		} 
 		while (token->sym == COMMA){
 			token = getToken();		// skip COMMA
 			goto loop; 
@@ -181,7 +205,7 @@ void var_def(){
 
 void stmt(){
 	switch(token->sym){
-		case ID:{
+		case ID:{	 
 			stmt_assign();
 			break;
 		} 
@@ -204,7 +228,7 @@ void stmt(){
 			var_def(); 
 			break; 
 		default:
-			errExit("bad symbol");
+			errExit("bad symbol:stmt");
 			break;
 		
 	}
@@ -234,6 +258,5 @@ int main(int argc, char* argv[]) {
 	program();
 	return 0;
 }
-
 
 

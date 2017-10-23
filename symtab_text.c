@@ -8,7 +8,7 @@ char * words[12] = {
 
 int main(){
 	int i;
-	printf("[insert]\n");
+	printf("[insert]\n"); //反对法饿饭饿饿方俄方俄方俄方俄方 
 	for (i = 0; i < 12; i ++){
 		printf("%s  ", words[i]);
 		sym_insert(words[i], K_VAR,0);

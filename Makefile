@@ -13,4 +13,4 @@ symtab.o:  symtab.h symtab.c
 	gcc -c symtab.c
 
 clean:
-	rm -f *.o parse
+	rm -f *.o parse *.stackdump

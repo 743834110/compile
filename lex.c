@@ -3,12 +3,14 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
+#include "symtab.h"
+#include "cmm.tab.h"
 #include "lex.h"
 #define BUFLEN 20
 
 typedef struct{
 	char *ID;
-	SYMBOL sym; 
+	int sym; 
 }Keyword; 
 
 // file 变量定义在lex.h头文件中 
@@ -18,7 +20,8 @@ char buff[BUFLEN];                      // 从文件中读取的字符的数目
 char *pos = buff + BUFLEN;          // 指向当前
 int size = 0;                               //当前缓冲区读入字符的 
 int lastChar;
-
+Token token;						//　为语法文件cmm.y准备token 
+FILE *file = NULL;
 
 // 用于检查是否为关键字的关键字到sym映射库，减少多重判断 
 Keyword keywords[] = {
@@ -29,7 +32,7 @@ Keyword keywords[] = {
 	{"print", PRINT},
 	{"return", RETURN},
 	{"read", READ},
-	{"NULL", NON} 	
+	{"NULL", 0} 	
 };
 
 //用于获取下一个字符，并来统计当前所读字符所在的行号和列号 
@@ -69,14 +72,14 @@ int getNumber(){
 	return var;
 }
 
-SYMBOL keyword_lookup(char *ID){
+int keyword_lookup(char *ID){
 	Keyword *p = keywords;
 	while(strcmp(p -> ID,ID) != 0 && strcmp(p -> ID,"NULL") != 0) // NON，NULL待统一 
 		p ++;
 	return p -> sym; 	
 }
 
-Token newToken(char *ID,SYMBOL sym){
+Token newToken(char *ID,int sym){
 	Token token = (Token)malloc(sizeof(*token));
 	token->ID = strdup(ID);
 	token->sym = sym;
@@ -108,8 +111,10 @@ int check_comment(int ch){
 	}
 } 
 
-Token getToken(){
-	Token token = NULL;
+int yylex(){
+	if (file == NULL)
+		file = stdin;
+//	Token token = NULL;	//用的是全局变量token 
 	int ch, ch2;  // ch2用于双字节运算符的判断 
 	if (file == NULL)
 		errExit("expect a text file");
@@ -121,15 +126,16 @@ Token getToken(){
 	// 暂时不考虑下划线开头的标识符 ：以及字符数越界等问题 
 	char buf[BUFLEN];
 	char *p = buf;
-	if (isalpha(ch)){  // 开头为字母的情况 
+	if (isalpha(ch)){  // 开头为字母的情况
 		do{
 			*p++ = ch; 
 		
 		} while(isalnum((ch = getChar())) && ch != EOF);
 		*p = '\0';
 		ungetChar();  // 回退字符串到输入流中 
-		SYMBOL sym = keyword_lookup(buf); 
+		int sym = keyword_lookup(buf); 
 		token = sym == 0?newToken(buf,ID):newToken(buf,sym); 
+
 	}
 	else if (isdigit(ch)){
 		ungetChar(); 
@@ -143,40 +149,16 @@ Token getToken(){
 	}
 	else	
 		switch(ch){
-			case '*':
-				token = newToken("*",MUL);
-				break;
-			case '-':
-				token = newToken("-",SUB);
-				break;
-			case '+':
-				token = newToken("+",ADD); 
-				break;
-			case '/':  // 两种注释方案要考虑一种同行注释，另外一种 
-				token = newToken("/",DIV);
-				break;
 			case '=':{
 				ch2 = getChar();
 				if (ch2 == '=')
 					token = newToken("==", EQ);
 				else{
 					ungetChar();
-					token = newToken("=",ASSIGN);
+					token = newToken("=",'=');
 				}  
 				break;
 			}
-			case ';':
-				token = newToken(";",SEMI);
-				break;
-			case '(':
-				token = newToken("(",LP);
-				break;
-			case ')':
-				token = newToken(")",RP);
-				break;
-			case ',':
-				token = newToken(",",COMMA);
-				break;
 			case '<':{
 				ch2 = getChar();
 				if (ch2 == '=') 
@@ -197,30 +179,26 @@ Token getToken(){
 				}
 				break;
 			}
-			case '{':
-				token = newToken("{",LC);
-				break;
-			case '}':
-				token = newToken("}",RC);
-				break;
 			case '!':{
 				ch2 = getChar();
 				if (ch2 == '=')
 					token = newToken("!=", NE);
 				else{
 					ungetChar();
-					token = newToken("!",NOT); 
+					token = newToken("!",'!'); 
 				} 
 				break;
 			}
 			case EOF:
-				token = newToken("",END);
+				token = newToken("",0);
 				break;
 			default:{
+				char strs[2] = {ch, 0};
+				token = newToken(strs, ch);
 			}
 		}
 
-	return token;
+	return token->sym;
 }
 void errExit(char *msg){
 	fprintf(stderr,"%s,在就近第%d行,第%d列\n",msg,LINENUM,COLNUM);

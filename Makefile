@@ -1,16 +1,19 @@
-OBJS = parse.o symtab.o lex.o
+OBJS = cmm.tab.o symtab.o lex.o
 
-parse:  $(OBJS)
-	gcc -o parse $(OBJS)
+cmm:  $(OBJS)
+	gcc -o cmm $(OBJS)
 
-parse.o:  lex.h symtab.h parse.c
-	gcc -c parse.c
+cmm.tab.h cmm.tab.c: cmm.y
+	bison -d cmm.y
 
-lex.o:  lex.h lex.c
+cmm.tab.o:  lex.h symtab.h cmm.tab.h cmm.tab.c
+	gcc -c cmm.tab.c
+
+lex.o: lex.h  lex.c
 	gcc -c lex.c
 
 symtab.o:  symtab.h symtab.c
 	gcc -c symtab.c
 
 clean:
-	rm -f *.o parse *.stackdump
+	rm -f *.o parse *.stackdump cmm

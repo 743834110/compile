@@ -1,0 +1,9 @@
+int x, y, z;
+x = 150;
+y = 120;
+
+if (x < y)
+    z = y - x;
+else
+    z = x - y;
+print z;

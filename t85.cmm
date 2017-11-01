@@ -1,0 +1,15 @@
+   int n, k;
+   n = 225;
+
+   k = 1;
+   while (k <= n/2)
+        k = k * 2;
+
+   while (k > 0){ 
+      if (n >= k) {
+         print 1;
+         n = n - k;
+      } else
+         print 0;
+      k = k / 2;
+   }

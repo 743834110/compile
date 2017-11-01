@@ -1,0 +1,8 @@
+   int z, k;
+
+   z = 1;  k = 2;
+   while ( k <= 9 ) {
+      z = z*k;
+      k = k + 1;
+   }
+   print z;

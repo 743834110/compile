@@ -68,6 +68,7 @@
 	#include "lex.h"
 	#include "symtab.h"
 	#include <stdlib.h>
+	#include "expr.h"
 	
 	extern int LINENUM;
 	extern int COLNUM;
@@ -76,7 +77,6 @@
 	
 	symItem symbol_def (symKind kind);
 	symItem symbol_use (symKind kind);
-	void code_binary(char* ID);
 	
 
 #line 83 "cmm.tab.c" /* yacc.c:339  */
@@ -1299,108 +1299,120 @@ yyreduce:
 
   case 14:
 #line 52 "cmm.y" /* yacc.c:1646  */
-    {(yyvsp[0].sym) = symbol_def(K_VAR);}
+    {(yyvsp[0].sym) = symbol_def(K_VAR);var_push((yyvsp[0].sym));}
 #line 1304 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
 #line 53 "cmm.y" /* yacc.c:1646  */
-    {(yyvsp[0].sym) = symbol_def(K_VAR);}
+    {(yyvsp[0].sym) = symbol_def(K_VAR);var_push((yyvsp[0].sym));}
 #line 1310 "cmm.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 20:
+#line 65 "cmm.y" /* yacc.c:1646  */
+    {code_print();}
+#line 1316 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
 #line 75 "cmm.y" /* yacc.c:1646  */
     {(yyvsp[0].sym) = symbol_use(K_VAR);}
-#line 1316 "cmm.tab.c" /* yacc.c:1646  */
+#line 1322 "cmm.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 25:
+#line 75 "cmm.y" /* yacc.c:1646  */
+    {code_assign((yyvsp[-4].sym));}
+#line 1328 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
 #line 80 "cmm.y" /* yacc.c:1646  */
-    {(yyvsp[0].val) = token->integer;}
-#line 1322 "cmm.tab.c" /* yacc.c:1646  */
+    {(yyvsp[0].val) = token->integer;num_push((yyvsp[0].val));}
+#line 1334 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
 #line 81 "cmm.y" /* yacc.c:1646  */
-    {(yyvsp[0].sym) = symbol_use(K_VAR);}
-#line 1328 "cmm.tab.c" /* yacc.c:1646  */
+    {(yyvsp[0].sym) = symbol_use(K_VAR);var_push((yyvsp[0].sym));}
+#line 1340 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
 #line 82 "cmm.y" /* yacc.c:1646  */
-    {code_binary("-");}
-#line 1334 "cmm.tab.c" /* yacc.c:1646  */
+    {}
+#line 1346 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
 #line 83 "cmm.y" /* yacc.c:1646  */
-    {code_binary("+");}
-#line 1340 "cmm.tab.c" /* yacc.c:1646  */
+    {code_binary('+');}
+#line 1352 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
 #line 84 "cmm.y" /* yacc.c:1646  */
-    {code_binary("-");}
-#line 1346 "cmm.tab.c" /* yacc.c:1646  */
+    {code_binary('-');}
+#line 1358 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
 #line 85 "cmm.y" /* yacc.c:1646  */
-    {code_binary("*");}
-#line 1352 "cmm.tab.c" /* yacc.c:1646  */
+    {code_binary('*');}
+#line 1364 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
 #line 86 "cmm.y" /* yacc.c:1646  */
-    {code_binary("/");}
-#line 1358 "cmm.tab.c" /* yacc.c:1646  */
+    {code_binary('/');}
+#line 1370 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
 #line 87 "cmm.y" /* yacc.c:1646  */
-    {code_binary("<");}
-#line 1364 "cmm.tab.c" /* yacc.c:1646  */
+    {}
+#line 1376 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
 #line 88 "cmm.y" /* yacc.c:1646  */
-    {code_binary("<=");}
-#line 1370 "cmm.tab.c" /* yacc.c:1646  */
+    {}
+#line 1382 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
 #line 89 "cmm.y" /* yacc.c:1646  */
-    {code_binary(">");}
-#line 1376 "cmm.tab.c" /* yacc.c:1646  */
+    {}
+#line 1388 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
 #line 90 "cmm.y" /* yacc.c:1646  */
-    {code_binary(">=");}
-#line 1382 "cmm.tab.c" /* yacc.c:1646  */
+    {}
+#line 1394 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
 #line 91 "cmm.y" /* yacc.c:1646  */
-    {code_binary("&&");}
-#line 1388 "cmm.tab.c" /* yacc.c:1646  */
+    {}
+#line 1400 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
 #line 92 "cmm.y" /* yacc.c:1646  */
-    {code_binary("||");}
-#line 1394 "cmm.tab.c" /* yacc.c:1646  */
+    {}
+#line 1406 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
 #line 93 "cmm.y" /* yacc.c:1646  */
     {}
-#line 1400 "cmm.tab.c" /* yacc.c:1646  */
+#line 1412 "cmm.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1404 "cmm.tab.c" /* yacc.c:1646  */
+#line 1416 "cmm.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1632,10 +1644,6 @@ yyreturn:
 
 
 #include <stdio.h>
-
-void code_binary(char* ID){
-	
-}
 
 symItem symbol_def (symKind kind){
 	symItem s = sym_find(token->ID);

@@ -3,6 +3,7 @@
 	#include "lex.h"
 	#include "symtab.h"
 	#include <stdlib.h>
+	#include "expr.h"
 	
 	extern int LINENUM;
 	extern int COLNUM;
@@ -11,7 +12,6 @@
 	
 	symItem symbol_def (symKind kind);
 	symItem symbol_use (symKind kind);
-	void code_binary(char* ID);
 	
 %}
 
@@ -49,8 +49,8 @@ stmt:			var_def
 var_def:		INT ids ';'
 		;
 
-ids:			ID			{$1 = symbol_def(K_VAR);}
-		| 		ids ',' ID	{$3 = symbol_def(K_VAR);}
+ids:			ID			{$1 = symbol_def(K_VAR);var_push($1);}
+		| 		ids ',' ID	{$3 = symbol_def(K_VAR);var_push($3);}
 		;
 
 stmt_if:		IF cond stmt else
@@ -62,7 +62,7 @@ else:
 cond:			'(' expr ')'
 		;
 
-stmt_print:		PRINT exprs ';'
+stmt_print:		PRINT exprs ';'								{code_print();}
 		;
 
 exprs:			expr
@@ -72,34 +72,30 @@ exprs:			expr
 stmt_while:		WHILE cond stmt
 		;
 
-stmt_assign:	 ID {$1 = symbol_use(K_VAR);} '=' expr ';'	
+stmt_assign:	 ID {$1 = symbol_use(K_VAR);} '=' expr ';'	{code_assign($1);}
 		;
 
 
 
-expr:			NUM					{$1 = token->integer;}
-		|		ID					{$1 = symbol_use(K_VAR);}
-		| 		'-' expr %prec NEG	{code_binary("-");}
-		|		expr '+' expr		{code_binary("+");}
-		|		expr '-' expr		{code_binary("-");}
-		|		expr '*' expr		{code_binary("*");}
-		|		expr '/' expr		{code_binary("/");}
-		|		expr LT  expr		{code_binary("<");}
-		|		expr LE	 expr		{code_binary("<=");}
-		|		expr GT	 expr		{code_binary(">");}
-		|		expr GE	 expr		{code_binary(">=");}
-		|		expr AND expr		{code_binary("&&");}
-		|		expr OR	 expr		{code_binary("||");}
+expr:			NUM					{$1 = token->integer;num_push($1);}
+		|		ID					{$1 = symbol_use(K_VAR);var_push($1);}
+		| 		'-' expr %prec NEG	{}
+		|		expr '+' expr		{code_binary('+');}
+		|		expr '-' expr		{code_binary('-');}
+		|		expr '*' expr		{code_binary('*');}
+		|		expr '/' expr		{code_binary('/');}
+		|		expr LT  expr		{}
+		|		expr LE	 expr		{}
+		|		expr GT	 expr		{}
+		|		expr GE	 expr		{}
+		|		expr AND expr		{}
+		|		expr OR	 expr		{}
 		|		'(' expr ')'		{}
 		;
 
 %%
 
 #include <stdio.h>
-
-void code_binary(char* ID){
-	
-}
 
 symItem symbol_def (symKind kind){
 	symItem s = sym_find(token->ID);

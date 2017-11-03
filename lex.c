@@ -146,6 +146,8 @@ int yylex(){
 		//格式化数据，并写入到字符串当中 
 		sprintf(buf,"%d",integer);
 		token = newToken(buf,NUM); 
+		//给token->integer赋值 
+		token->integer = integer;	
 	}
 	else	
 		switch(ch){

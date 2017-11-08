@@ -54,7 +54,7 @@ char* toString(Datum d){
 }
 
 void code_cmp(char* s, char* s1, char* s2, char* s3){
-	printf("\t%s = %s %s %s", s, s1, s2, s3);
+	printf("\t%s = %s %s %s\n", s, s1, s2, s3);
 }
 //二元运算处理
 void code_binary(int op){

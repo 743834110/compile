@@ -15,6 +15,7 @@ typedef struct {
 Datum var_push(symItem var);
 Datum num_push(int num);
 Datum datum_pop();
+char* toString(Datum d);
 void code_binary(int op);		//二元运算处理
 void code_assign(symItem var);	//赋值运算处理
 void code_print();				//打印语句的处理

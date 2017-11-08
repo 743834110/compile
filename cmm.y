@@ -4,6 +4,7 @@
 	#include "symtab.h"
 	#include <stdlib.h>
 	#include "expr.h"
+	#include "ctrl.h"
 	
 	extern int LINENUM;
 	extern int COLNUM;
@@ -53,13 +54,13 @@ ids:			ID			{$1 = symbol_def(K_VAR);var_push($1);}
 		| 		ids ',' ID	{$3 = symbol_def(K_VAR);var_push($3);}
 		;
 
-stmt_if:		IF cond stmt else
+stmt_if:		IF cond stmt else	{code_if_end();}
 		;
 else:			
-		|		ELSE stmt
+		|		ELSE	{code_else_part();}	stmt		
 		;
 		
-cond:			'(' expr ')'
+cond:			'(' expr ')'	{code_cond();}
 		;
 
 stmt_print:		PRINT exprs ';'								{code_print();}
@@ -69,7 +70,7 @@ exprs:			expr
 		|		exprs ',' expr
 		;
 		
-stmt_while:		WHILE cond stmt
+stmt_while:		WHILE	{code_while_begin();} cond stmt	{code_while_end();}
 		;
 
 stmt_assign:	 ID {$1 = symbol_use(K_VAR);} '=' expr ';'	{code_assign($1);}
@@ -84,10 +85,10 @@ expr:			NUM					{$1 = token->integer;num_push($1);}
 		|		expr '-' expr		{code_binary('-');}
 		|		expr '*' expr		{code_binary('*');}
 		|		expr '/' expr		{code_binary('/');}
-		|		expr LT  expr		{}
-		|		expr LE	 expr		{}
-		|		expr GT	 expr		{}
-		|		expr GE	 expr		{}
+		|		expr LT  expr		{code_binary(LT);}
+		|		expr LE	 expr		{code_binary(LE);}
+		|		expr GT	 expr		{code_binary(GT);}
+		|		expr GE	 expr		{code_binary(GE);}
 		|		expr AND expr		{}
 		|		expr OR	 expr		{}
 		|		'(' expr ')'		{}

@@ -1,4 +1,4 @@
-OBJS = cmm.tab.o symtab.o lex.o expr.o
+OBJS = cmm.tab.o symtab.o lex.o expr.o ctrl.o
 
 cmm:  $(OBJS)
 	gcc -o cmm $(OBJS)
@@ -17,6 +17,9 @@ symtab.o:  symtab.h symtab.c
 
 expr.o:	expr.h expr.c
 	gcc -c expr.c
+
+ctrl.o:	ctrl.h ctrl.c
+	gcc -c ctrl.c
 
 clean:
 	rm -f *.o parse *.stackdump cmm

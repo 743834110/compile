@@ -71,7 +71,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 18 "cmm.y" /* yacc.c:1909  */
+#line 19 "cmm.y" /* yacc.c:1909  */
 
 	int val;		//整数 
 	symItem sym;	//符号表项 
